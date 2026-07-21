@@ -1,6 +1,6 @@
 # ADR-004: Custom CQRS and modular-monolith-first architecture
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-21
 - **Deciders:** Serhat Alaftekin
 - **Phase:** 0 (implemented from Phase 1; extraction in Phase 6)
@@ -63,11 +63,20 @@ its database schema exclusively, exposes only **public contracts and events**, a
 references another module's internals. These rules are **enforced by ArchUnitNET** as
 executable law (Domain references nothing; Application references only Domain; Infrastructure
 is unreferenced by Domain/Application; exactly one handler per command; no cross-module
-internal references). Services are **extracted in Phase 6** ([ADR-013](./0013-service-extraction.md))
+internal references).
+
+**Cross-module interaction rules** make "public contracts and events" precise:
+
+- **Async by default:** cross-module flows go through **events** (raised in-process now, carried over the broker from Phase 3), not direct calls.
+- **Sync only through a public contract:** a synchronous in-process call is allowed **only** via another module's **public contract interface**, and **only** where the use case genuinely needs immediate consistency — **never** by reaching into another module's database (no cross-module joins or queries; ArchUnitNET catches the reference, and the rule holds in words too).
+- **No shared transactions:** modules **never share a database transaction**; consistency *between* modules is **eventual, via the outbox**. This is precisely what makes the Phase 6 extraction "a transport change, not a redesign" — there is no distributed transaction to unwind when a module moves across the network.
+
+Services are **extracted in Phase 6** ([ADR-013](./0013-service-extraction.md))
 when a real driver appears (independent scaling/deploy cadence) — at which point a good
 boundary makes extraction near-zero-change. The **AI service is the deliberate exception**:
 it is standalone from Phase 4.5 because its scaling profile is known up front — *designed*
-separate, whereas Notifications is *extracted* once its boundary has matured in-process.
+separate, whereas Notifications is *extracted* once its boundary has matured in-process (the
+full designed-vs-extracted contrast lives in [ADR-013](./0013-service-extraction.md)).
 
 ### Consequences
 
