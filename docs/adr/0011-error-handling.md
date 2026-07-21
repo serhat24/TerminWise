@@ -1,6 +1,6 @@
 # ADR-011: Error handling — Result pattern and RFC 9457 mapping
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-21
 - **Deciders:** Serhat Alaftekin
 - **Phase:** 1
@@ -75,7 +75,40 @@ uncaught faults share the response shape, without the domain ever throwing for c
 | `Unauthorized` | **401** | problem details | missing/invalid token |
 | `Unexpected` | **500** | problem details (via exception handler) | *should be an exception, not a Result* |
 
-The mapper owns this table — the single source of truth for status codes.
+The mapper owns this table — the single source of truth for status codes. (**422 Unprocessable
+Entity** was considered for `Validation` and rejected: it is ASP.NET's `ValidationProblemDetails`
+default to return **400**, and 422's semantic gain here is marginal — ecosystem consistency beats
+pedantry, and fighting the framework needs a bigger payoff.)
+
+For all responses, `type` is set explicitly to the RFC 9457 default **`about:blank`** (meaning
+"no semantics beyond the HTTP status") rather than left undefined; with `about:blank`, `title` is
+the status phrase. Clients key off `status` + the `errorCode` extension. A curated catalog of
+bespoke problem-**`type`** URIs may be introduced in a **future ADR**; until then, `about:blank`
++ `errorCode` is the contract.
+
+### Validation failures are plural and field-level
+
+A `Validation` result maps to **`ValidationProblemDetails` (400)** whose `errors` member is the
+ASP.NET dictionary shape — field name → array of messages — so the client can bind each message
+to the **matching Signal Form control**, not merely toast one line:
+
+```json
+{
+  "type": "about:blank",
+  "title": "One or more validation errors occurred.",
+  "status": 400,
+  "errors": {
+    "startsAt":  ["startsAt is required."],
+    "serviceId": ["Unknown service."]
+  },
+  "traceId": "00-4bf92f...-01"
+}
+```
+
+This `errors` shape is a **pinned contract**: the FluentValidation pipeline behavior produces it,
+and the Phase 1 Angular work ([ADR-009](./0009-frontend-state.md)) consumes it to drive per-field
+Signal Forms validation. Single-error failures (NotFound/Conflict/Forbidden/…) use `detail` +
+`errorCode`; validation failures additionally carry `errors`.
 
 ### The full journey of one failure — "slot already taken"
 
@@ -92,7 +125,7 @@ The mapper owns this table — the single source of truth for status codes.
 3. **Mapping layer** — the endpoint sees a failed `Result`, reads `Error.Type == Conflict`, and emits **HTTP 409** as RFC 9457 problem details (`application/problem+json`):
    ```json
    {
-     "type": "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+     "type": "about:blank",
      "title": "Conflict",
      "status": 409,
      "detail": "The selected time slot is no longer available.",
@@ -101,7 +134,7 @@ The mapper owns this table — the single source of truth for status codes.
      "traceId": "00-4bf92f...-01"
    }
    ```
-   `errorCode` (stable) and `traceId` are RFC 9457 **extension members**; `traceId` ties into observability ([ADR-012](./0012-observability.md)).
+   `type` is the RFC 9457 default `about:blank`; `errorCode` (stable) and `traceId` are RFC 9457 **extension members**; `traceId` ties into observability ([ADR-012](./0012-observability.md)).
 4. **Angular client** — `httpResource`/`HttpClient` receives the 409; a typed error interceptor branches on the **`errorCode`** (`Booking.SlotAlreadyTaken`), not the human `detail`, and shows a localized message ("That slot was just taken — pick another"), surfaced on the Signal Form. The stable code is the contract; `detail` is for humans/logs.
 
 ### Consequences

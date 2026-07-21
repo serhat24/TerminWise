@@ -18,7 +18,7 @@ licensing or version claims).
 | [ADR-002](./0002-keycloak-tenancy.md) | Keycloak tenancy (realm-per-tenant vs single realm + Organizations/groups) | Accepted | 0 |
 | [ADR-003](./0003-message-broker-and-client.md) | Message broker & client library (RabbitMQ vs Kafka; thin custom vs MassTransit vs Rebus) | Accepted | 0 |
 | [ADR-004](./0004-custom-cqrs-modular-monolith.md) | Custom CQRS + modular-monolith-first (why no MediatR; module boundaries as future services) | Accepted | 0 |
-| [ADR-011](./0011-error-handling.md) | Error handling — Result pattern + RFC 9457 mapping (custom vs ErrorOr vs FluentResults) | Proposed | 1 |
+| [ADR-011](./0011-error-handling.md) | Error handling — Result pattern + RFC 9457 mapping (custom vs ErrorOr vs FluentResults) | Accepted | 1 |
 
 > Later phases add ADR-005 (cache), 006 (reliable messaging), 007 (search isolation),
 > 008/008b (AI authz & stack), 009 (frontend state), 010 (UI foundation),
