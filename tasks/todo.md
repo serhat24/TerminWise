@@ -3,17 +3,37 @@
 Legend: `[ ]` todo · `[~]` in progress · `[x]` done · `⛳` checkpoint (stop for sign-off)
 
 ## Slice 0 — Repo bootstrap
-- [ ] 0.1 git init (main) + LICENSE (MIT) + .gitignore + .editorconfig + .gitattributes
-- [ ] 0.2 scaffold dirs: src/ tests/ frontend/ docs/adr/ docs/diagrams/ .github/workflows/ + docker-compose.yml placeholder
-- [ ] 0.3 ADR MADR template (docs/adr/0000-madr-template.md) + ADR index (docs/adr/README.md, 001–004 Proposed)
-- [ ] 0.4 README skeleton (vision, tech-stack table, changelog stub, ADR link, architecture placeholder)
-- [ ] 0.5 verify .NET LTS → minimal .sln + placeholder src lib + xUnit smoke test → CI workflow (build+test+docs, verified action versions) → green locally
-- [ ] 0.6 (DEFERRED) prepare gh repo-create + branch-protection commands; hand to user, do NOT execute
+- [x] 0.1 git init (main) + LICENSE (MIT) + .gitignore + .editorconfig + .gitattributes
+- [x] 0.2 scaffold dirs: src/ tests/ frontend/ docs/adr/ docs/diagrams/ .github/workflows/ + docker-compose.yml placeholder
+- [x] 0.3 ADR MADR template (docs/adr/0000-madr-template.md) + ADR index (docs/adr/README.md, 001–004 Proposed)
+- [x] 0.4 README skeleton (vision, tech-stack table, changelog stub, ADR link, architecture placeholder)
+- [x] 0.5 .NET 10 LTS → TerminWise.slnx + placeholder src lib + xUnit smoke test → CI (build+test+format, verified action versions) → green locally (build ✔, 2 tests ✔, format ✔)
+- [~] 0.6 (DEFERRED — prepared, NOT executed) gh repo-create + branch-protection commands below
+
+### 0.6 — Commands for you to run when ready to publish (local-only until then)
+```bash
+# From D:\Projects — create the PUBLIC repo, push main, set description + topics
+gh repo create TerminWise --public --source=. --remote=origin --push \
+  --description "Multi-tenant, event-driven SaaS reference architecture — .NET modular monolith evolving to microservices. Clean Architecture, custom CQRS, Keycloak, RabbitMQ + Outbox, Angular 22 Signal Forms, AI booking assistant."
+
+gh repo edit --add-topic dotnet,angular,clean-architecture,multi-tenant,cqrs,ddd,modular-monolith,microservices,keycloak,rabbitmq,event-driven,saas,reference-architecture,postgresql
+
+# Branch protection on main: require PR + green CI (both CI jobs)
+gh api -X PUT repos/{owner}/TerminWise/branches/main/protection \
+  -H "Accept: application/vnd.github+json" \
+  -F "required_status_checks[strict]=true" \
+  -F "required_status_checks[checks][][context]=Build & test (backend)" \
+  -F "required_status_checks[checks][][context]=Format (editorconfig)" \
+  -F "enforce_admins=true" \
+  -F "required_pull_request_reviews[required_approving_review_count]=0" \
+  -F "restrictions=" 2>/dev/null || echo "adjust owner; some protections need the repo to exist first"
+```
 
 - [ ] ⛳ CHECKPOINT A — user reviews structure + confirms CI green before ADR drafting
 
 ## Slices 1–4 — ADRs (sequential, gated)
-- [ ] ADR-001 Postgres tenancy — verify (RLS/EF Core+Npgsql) → draft → review → Accept → merge
+- [~] ADR-001 Postgres tenancy — verify (RLS/EF Core+Npgsql) → draft → review → Accept → merge
+      - [~] docs: (a) RLS + SET app.current_tenant vs Npgsql pooling (stale session reset), (b) EF Core global query filters, (c) Npgsql/EF Core multi-tenancy guidance
 - [ ] ⛳ approval gate before ADR-002
 - [ ] ADR-002 Keycloak tenancy — verify (Organizations feature/version) → draft → review → Accept → merge
 - [ ] ⛳ approval gate before ADR-003
