@@ -56,7 +56,11 @@ gh api -X PUT repos/{owner}/TerminWise/branches/main/protection \
 - [x] 5.2 acceptance check: build/test/format green locally · 4 ADRs Accepted+merged · README vision+architecture ✔
 - [x] 5.3 bumped CLAUDE.md Current phase → 1 + flipped README Phase 0 status → done (confirmed 2026-07-21)
 - [x] ⛳ CHECKPOINT B — Phase 0 → Phase 1 gate — SIGNED OFF 2026-07-21
-- [x] 0.6 PUBLISH — user changed plan: publish now before Phase 1 (see publish result below)
+- [x] 0.6 PUBLISH — user changed plan: publish now before Phase 1 ✔
+      Repo: https://github.com/serhat24/TerminWise (public) · 14 topics set
+      First real CI run (push, run 29867930965): **success** — Build & test (backend) ✔, Format (editorconfig) ✔
+      Branch protection on main: PRs required · strict status checks (both CI jobs) · enforce_admins · no force-push/delete
+      → "repo builds in CI" verified on the actual runner, not just locally.
 
 ## Blockers / needs from you
 
