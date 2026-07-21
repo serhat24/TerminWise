@@ -62,6 +62,15 @@ gh api -X PUT repos/{owner}/TerminWise/branches/main/protection \
       Branch protection on main: PRs required · strict status checks (both CI jobs) · enforce_admins · no force-push/delete
       → "repo builds in CI" verified on the actual runner, not just locally.
 
+## Phase 1 — ADRs first (before code), same rhythm
+- [~] ADR-011 Result pattern — verified (RFC 9457 obsoletes 7807; .NET 10 ProblemDetails; ErrorOr/FluentResults both MIT) → **drafted** → review → Accept → merge (PR)
+      Decision: custom Result/Result<T> + Error + ErrorType; single Result→RFC 9457 mapper via IProblemDetailsService. Taxonomy→HTTP (Validation 400 / NotFound 404 / Conflict 409 / Forbidden 403 / Unauthorized 401 / Unexpected 500). Results = expected failures; exceptions = bugs/infra. "slot taken" journey traced end-to-end. ErrorOr = off-ramp.
+- [ ] ⛳ approval gate before ADR-009
+- [ ] ADR-009 frontend state (SignalStore vs classic NgRx vs signals) — verify Angular 22 docs → draft → review → Accept → merge
+- [ ] ⛳ approval gate before ADR-010
+- [ ] ADR-010 UI foundation (Tailwind v4 + Angular Material vs PrimeNG vs headless) — verify → draft → review → Accept → merge
+- [ ] then: Phase 1 code (Clean Architecture skeleton, custom CQRS, Booking module) — separate planning
+
 ## Blockers / needs from you
 
 - [x] Repo name for GitHub → **TerminWise**
