@@ -24,7 +24,7 @@
 | Search | Elasticsearch (tenant isolation strategy in ADR) |
 | AI | **Standalone AI service from day one** — **Microsoft Agent Framework** (1.0 GA, .NET) + **Azure AI Foundry** (model via Foundry catalog — Claude/GPT selectable, code stays model-agnostic); tool calling against the platform's public API, SSE streaming |
 | Background jobs | Custom `BackgroundService` for the outbox dispatcher; **Quartz.NET** (Apache 2.0) with PostgreSQL persistent job store + clustering for scheduled jobs (appointment reminders); graceful shutdown via cancellation tokens (ADR-014) |
-| Error handling | Custom **Result pattern** (`Result<T>`): handlers return Results, no exceptions for control flow; mapped to RFC 7807 problem details (ADR-011) |
+| Error handling | Custom **Result pattern** (`Result<T>`): handlers return Results, no exceptions for control flow; mapped to RFC 9457 problem details (ADR-011) |
 | Idempotency | Messaging: Inbox pattern (Phase 3). HTTP: `Idempotency-Key` header middleware for POST operations, Redis-backed (Phase 2) |
 | Observability | **OpenTelemetry for all three signals** — logs via native `ILogger` + OTel Logs (no separate logging framework), metrics, traces — exported over OTLP. Local/default backend: **Grafana stack** (Prometheus, Loki, Tempo, Grafana, docker-compose); optional Azure export target: Application Insights (ADR-012) |
 | Testing (backend) | xUnit (unit), **ArchUnitNET** (architecture rules), Testcontainers (integration: DB, RabbitMQ, Redis, Elasticsearch, Keycloak) |
@@ -69,8 +69,8 @@
 
 **Scope**
 - Clean Architecture skeleton with custom CQRS (command/query dispatchers, pipeline behaviors for validation/logging).
-- **FluentValidation** integrated as a validation pipeline behavior: every command passes through registered validators before reaching its handler; validation failures map to consistent API error responses (RFC 7807 problem details).
-- **Result pattern:** lightweight custom `Result<T>`/`Error` types; command/query handlers return Results (no exceptions for expected failures); a single mapping layer converts Results — including FluentValidation failures — to RFC 7807 responses. **New ADR-011:** error handling strategy (Result pattern vs. exceptions; custom type vs. ErrorOr/FluentResults).
+- **FluentValidation** integrated as a validation pipeline behavior: every command passes through registered validators before reaching its handler; validation failures map to consistent API error responses (RFC 9457 problem details).
+- **Result pattern:** lightweight custom `Result<T>`/`Error` types; command/query handlers return Results (no exceptions for expected failures); a single mapping layer converts Results — including FluentValidation failures — to RFC 9457 responses. **New ADR-011:** error handling strategy (Result pattern vs. exceptions; custom type vs. ErrorOr/FluentResults).
 - Single module: **Booking** — business profile, services, staff, availability rules, appointment creation/cancellation. Module boundaries are designed as **future service boundaries** from day one: modules expose only public contracts and events, own their DB schema exclusively, and never reference another module's internals (enforced by architecture tests) — this is what makes Phase 6 extraction cheap and real.
 - EF Core persistence; domain model with DDD tactical patterns (aggregates, value objects, domain events raised in-process for now).
 - Angular 22 scaffold: zoneless, OnPush, standalone components, Tailwind CSS v4 + Angular Material theme.
