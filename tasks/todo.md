@@ -38,8 +38,9 @@ gh api -X PUT repos/{owner}/TerminWise/branches/main/protection \
 - [x] ADR-002 Keycloak tenancy — verified (Keycloak 26.x Organizations GA since 26.0, 2026-07-21) → drafted → reviewed → **Accepted** → merged
       Decision: single realm + Organizations (tenant = org). `organization` claim → app.current_tenant (spine with ADR-001). Multi-org users: fail-closed, single-org token only. Machine clients deferred to ADR-008.
 - [x] ⛳ approval gate before ADR-003 — passed
-- [ ] ADR-003 broker & client — verify (MassTransit/Rebus licensing) → draft → review → Accept → merge
-- [ ] ⛳ approval gate before ADR-004
+- [x] ADR-003 broker & client — verified (MassTransit v9 commercial/v8 EOL 2026; Rebus MIT 8.9.2; RabbitMQ.Client 7.2.1) → drafted → reviewed → **Accepted** → merged
+      Decision: RabbitMQ + thin custom client over RabbitMQ.Client v7. Rebus = OSS off-ramp. Explicit in/out scope. Envelope carries tenant_id (fail-closed) + W3C traceparent.
+- [x] ⛳ approval gate before ADR-004 — passed
 - [ ] ADR-004 custom CQRS + modular-monolith-first — verify (MediatR licensing) → draft → review → Accept → merge
 - [ ] ⛳ approval gate before Slice 5
 

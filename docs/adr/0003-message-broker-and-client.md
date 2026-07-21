@@ -1,6 +1,6 @@
 # ADR-003: Message broker and client library
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-21
 - **Deciders:** Serhat Alaftekin
 - **Phase:** 0 (implemented in Phase 3)
@@ -58,6 +58,18 @@ same way:
 
 **Rebus (MIT)** is explicitly documented as the pragmatic OSS **framework alternative** for
 adopters who would rather not hand-roll — it is the recommended off-ramp, not MassTransit.
+
+**Scope of the custom client (explicit non-goals).** To keep Phase 3 from quietly growing
+into a framework, the abstraction's surface is fixed:
+
+- **In scope:** publish; consume (competing consumers); retry with backoff; dead-letter (DLQ) topology; inbox deduplication; message-header propagation.
+- **Out of scope (non-goals):** sagas / process managers; scheduling (Quartz.NET owns that — ADR-014); a multi-broker transport abstraction (we target RabbitMQ only — the seam that keeps `RabbitMQ.Client` from leaking across modules exists for testability and boundary hygiene, not for portability).
+
+**Message envelope contract.** Two headers are part of the envelope from day one, designed
+in rather than bolted on:
+
+- **Tenant propagation:** every message carries `tenant_id` in its envelope; a consumer sets `app.current_tenant` from it *before* any database work — extending the ADR-001/ADR-002 through-line (`org claim → app.current_tenant → RLS`) into the asynchronous path. Consumers **fail-closed on a missing/empty tenant header**: the message is dead-lettered, never processed unscoped.
+- **Trace propagation:** the client propagates **W3C trace context** (`traceparent`) through message headers, so a published event and its consumer join the same distributed trace — designing in Phase 4's "a single trace spans API → broker → consumer" acceptance criterion instead of retrofitting it.
 
 ### Consequences
 
