@@ -1,6 +1,6 @@
 # ADR-001: Tenancy model on PostgreSQL
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-21
 - **Deciders:** Serhat Alaftekin
 - **Phase:** 0 (implemented in Phase 2)
@@ -49,8 +49,9 @@ This is chosen because it delivers the **strongest, DB-enforced isolation at the
 - **Good — isolation survives buggy code.** RLS is enforced by PostgreSQL, so a missing filter, an `IgnoreQueryFilters()`, or hand-written SQL still cannot leak across tenants.
 - **Good — cheapest ops & highest density.** One database, one schema, one migration path; onboarding a tenant is an `INSERT`, not provisioning.
 - **Good — clean test story.** A single integration test (Testcontainers PostgreSQL) sets tenant A, queries, switches to tenant B, and asserts zero cross-visibility — proving the DB boundary, not just app logic.
+- **Good — table classification is enforced, not conventional.** A Phase 2 test inspects the schema and **fails if any table is neither RLS-enabled (with `FORCE`) nor on an explicit non-tenant allowlist** — tenant catalog/registry, Quartz.NET job-store tables, EF Core migrations-history table (extended as needed). Every new table must be consciously classified as tenant-owned or shared; nothing is isolated (or exempted) by accident.
 - **Trade-off — connection-pool discipline is mandatory.** The tenant must be set with `set_config(..., true)`/`SET LOCAL` inside the transaction so it is transaction-scoped and auto-discarded; Npgsql's default `DISCARD ALL` reset on pool return must stay on, and **`No Reset On Close` must never be used** with a session-level tenant variable, or a pooled connection could carry one tenant's context to the next. (Npgsql pooling reset; PostgreSQL `set_config`.)
-- **Trade-off — the app DB role must not own the tables and must not have `BYPASSRLS`;** migrations run as a separate privileged role. This role separation has to be set up deliberately.
+- **Trade-off — the app DB role must not own the tables and must not have `BYPASSRLS`;** migrations run as a separate privileged owner/migration role. This role separation has to be set up deliberately. Because that migration role owns the tables and **bypasses RLS by design**, migrations must never contain data-touching statements that assume a tenant context (no tenant-scoped `INSERT`/`UPDATE`/`DELETE` in migrations — RLS will not scope them, so they would run unfiltered across all tenants).
 - **Trade-off — noisy-neighbor and "blast radius" are shared.** One tenant's heavy load or a table-wide corruption affects all; per-tenant physical isolation is intentionally traded away (revisit for enterprise/regulated tenants — a future ADR could allow a hybrid where a premium tenant gets its own database via the same `ITenantStore` abstraction).
 - **Follow-up (Phase 2):** implement tenant resolution middleware, tenant-scoped `DbContext` (scoped factory to play well with pooling), the app/migration role split, and the RLS policy migrations. A central tenant catalog ("AdminDb") maps tenant → id.
 

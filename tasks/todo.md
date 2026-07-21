@@ -32,9 +32,9 @@ gh api -X PUT repos/{owner}/TerminWise/branches/main/protection \
 - [ ] ⛳ CHECKPOINT A — user reviews structure + confirms CI green before ADR drafting
 
 ## Slices 1–4 — ADRs (sequential, gated)
-- [~] ADR-001 Postgres tenancy — verify (RLS/EF Core+Npgsql) → draft → review → Accept → merge
-      - [~] docs: (a) RLS + SET app.current_tenant vs Npgsql pooling (stale session reset), (b) EF Core global query filters, (c) Npgsql/EF Core multi-tenancy guidance
-- [ ] ⛳ approval gate before ADR-002
+- [x] ADR-001 Postgres tenancy — verified (RLS/EF Core 10/Npgsql, 2026-07-21) → drafted → reviewed → **Accepted** → merged
+      Decision: shared schema + tenant discriminator (EF global query filter = ergonomics) + PostgreSQL RLS (= the guarantee). Non-owner app role, FORCE RLS, SET LOCAL per txn. Phase 2: schema-inspection test fails on unclassified tables; migration role bypasses RLS by design.
+- [x] ⛳ approval gate before ADR-002 — passed
 - [ ] ADR-002 Keycloak tenancy — verify (Organizations feature/version) → draft → review → Accept → merge
 - [ ] ⛳ approval gate before ADR-003
 - [ ] ADR-003 broker & client — verify (MassTransit/Rebus licensing) → draft → review → Accept → merge
