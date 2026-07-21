@@ -14,7 +14,7 @@ licensing or version claims).
 
 | ADR | Title | Status | Phase |
 |---|---|---|---|
-| [ADR-001](./0001-postgres-tenancy-model.md) | Tenancy model on PostgreSQL (db-per-tenant vs schema-per-tenant vs shared+discriminator vs shared+RLS) | Proposed | 0 |
+| [ADR-001](./0001-postgres-tenancy-model.md) | Tenancy model on PostgreSQL (db-per-tenant vs schema-per-tenant vs shared+discriminator vs shared+RLS) | Accepted | 0 |
 | [ADR-002](./0002-keycloak-tenancy.md) | Keycloak tenancy (realm-per-tenant vs single realm + Organizations/groups) | Proposed | 0 |
 | [ADR-003](./0003-message-broker-and-client.md) | Message broker & client library (RabbitMQ vs Kafka; thin custom vs MassTransit vs Rebus) | Proposed | 0 |
 | [ADR-004](./0004-custom-cqrs-modular-monolith.md) | Custom CQRS + modular-monolith-first (why no MediatR; module boundaries as future services) | Proposed | 0 |
