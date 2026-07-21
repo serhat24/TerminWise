@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TerminWise.BuildCheck/TerminWise.BuildCheck.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TerminWise.BuildCheck.Tests/TerminWise.BuildCheck.Tests.csproj" />
+  </Folder>
+</Solution>

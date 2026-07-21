@@ -1,0 +1,49 @@
+# EditorConfig — https://editorconfig.org
+# C# + TypeScript conventions for TerminWise.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{md,markdown}]
+trim_trailing_whitespace = false   # trailing spaces are meaningful (hard line breaks)
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# ---- TypeScript / JavaScript / HTML / CSS (frontend) ----
+[*.{ts,js,mjs,cjs,html,css,scss}]
+indent_size = 2
+quote_type = single
+
+# ---- C# ----
+[*.cs]
+indent_size = 4
+
+# .NET code style (enforced in CI later via `dotnet format`)
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+csharp_using_directive_placement = outside_namespace:warning
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = true:warning
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+dotnet_naming_rule.private_fields_underscore.severity = suggestion
+
+# Naming: interfaces start with I
+dotnet_naming_rule.interfaces_start_with_i.severity = warning
+dotnet_naming_rule.interfaces_start_with_i.symbols = interface_symbols
+dotnet_naming_rule.interfaces_start_with_i.style = prefix_i_style
+dotnet_naming_symbols.interface_symbols.applicable_kinds = interface
+dotnet_naming_style.prefix_i_style.required_prefix = I
+dotnet_naming_style.prefix_i_style.capitalization = pascal_case
+
+[*.csproj]
+indent_size = 2

@@ -1,0 +1,57 @@
+# ---- .NET / Visual Studio ----
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+project.lock.json
+artifacts/
+*.nupkg
+*.snupkg
+TestResults/
+[Cc]overage*/
+*.coverage
+*.trx
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# ---- Node / Angular ----
+node_modules/
+dist/
+.angular/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+.eslintcache
+coverage/
+playwright-report/
+test-results/
+/frontend/.env
+/frontend/.env.*
+
+# ---- Env / secrets ----
+.env
+.env.*
+!.env.example
+*.pem
+appsettings.*.local.json
+
+# ---- Claude Code (local, per-machine) ----
+.claude/settings.local.json
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+*.swp
+*~

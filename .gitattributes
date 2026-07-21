@@ -1,0 +1,26 @@
+# Normalize line endings: repo stores LF, checkout is platform-native.
+* text=auto
+
+# Explicitly LF for source & config (avoids CRLF surprises on Windows).
+*.cs        text eol=lf
+*.csproj    text eol=lf
+*.sln       text eol=crlf
+*.ts        text eol=lf
+*.js        text eol=lf
+*.json      text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.md        text eol=lf
+*.editorconfig text eol=lf
+
+# Scripts keep their platform's endings.
+*.ps1       text eol=crlf
+*.sh        text eol=lf
+
+# Binary assets — never touch.
+*.png       binary
+*.jpg       binary
+*.gif       binary
+*.ico       binary
+*.woff      binary
+*.woff2     binary

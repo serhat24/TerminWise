@@ -1,0 +1,11 @@
+# TerminWise — local development stack (placeholder).
+#
+# Services are added phase by phase as the architecture grows:
+#   Phase 2: postgres, keycloak, redis
+#   Phase 3: rabbitmq
+#   Phase 4: elasticsearch + Grafana stack (prometheus, loki, tempo, grafana)
+#   Phase 4.5: ai-assistant service
+#   Phase 6: yarp gateway, notifications service
+#
+# Intentionally empty in Phase 0 — no runtime services exist yet.
+services: {}
