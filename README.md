@@ -21,11 +21,39 @@
 
 ## Architecture at a glance
 
-> 🚧 _Placeholder — finalized in Phase 0 Slice 5 with a context diagram once the founding
-> ADRs are accepted._ The system starts as a **modular monolith** whose module boundaries
-> are designed as **future service boundaries** (modules expose only public contracts and
-> events, own their DB schema, never reference another module's internals — enforced by
-> architecture tests). Phase 6 extracts services along those seams.
+The system starts as a **modular monolith** whose module boundaries are designed as
+**future service boundaries**: modules own their DB schema, expose only public contracts and
+events, never reference another module's internals, and share no database transaction —
+consistency between modules is eventual, via the outbox ([ADR-004](./docs/adr/0004-custom-cqrs-modular-monolith.md)).
+These rules are enforced by architecture tests. Phase 6 extracts services along those seams.
+
+### The tenant-context spine
+
+The architectural backbone is a single tenant-identity path that runs from login all the way
+to the database row, and continues across async message boundaries. Identity decides the
+tenant; the database *enforces* it.
+
+```mermaid
+flowchart LR
+    U([User]) -->|identity-first login| KC[Keycloak<br/>single realm · Organizations<br/>ADR-002]
+    KC -->|token · organization claim| API[Platform API]
+    API -->|validate claim<br/>fail-closed if absent/ambiguous| API
+    API -->|SET LOCAL app.current_tenant| DB[(PostgreSQL<br/>Row Level Security<br/>ADR-001)]
+    API -->|domain event<br/>envelope: tenant_id + traceparent<br/>ADR-003| MQ{{RabbitMQ<br/>Outbox → Inbox}}
+    MQ -->|consumer sets app.current_tenant<br/>before any DB work| CON[Module consumer<br/>e.g. Notifications]
+    CON -->|SET LOCAL app.current_tenant| DB
+```
+
+**Read the spine as:** `login → organization claim → app.current_tenant → RLS`. The
+`organization` claim ([ADR-002](./docs/adr/0002-keycloak-tenancy.md)) supplies the tenant id;
+the API validates it and pushes it to the DB session as `app.current_tenant`; PostgreSQL
+**Row Level Security** ([ADR-001](./docs/adr/0001-postgres-tenancy-model.md)) makes isolation
+a database guarantee, not an application convention. The **same tenant context rides every
+message** — the envelope carries `tenant_id` (consumers fail-closed without it) and W3C
+`traceparent` ([ADR-003](./docs/adr/0003-message-broker-and-client.md)) — so isolation and
+tracing hold across the async path too. Diagram source: [`docs/diagrams/tenant-context-spine.md`](./docs/diagrams/tenant-context-spine.md).
+
+See all decisions in the [ADR index](./docs/adr/README.md).
 
 ## Tech stack
 
