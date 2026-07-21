@@ -35,8 +35,9 @@ gh api -X PUT repos/{owner}/TerminWise/branches/main/protection \
 - [x] ADR-001 Postgres tenancy — verified (RLS/EF Core 10/Npgsql, 2026-07-21) → drafted → reviewed → **Accepted** → merged
       Decision: shared schema + tenant discriminator (EF global query filter = ergonomics) + PostgreSQL RLS (= the guarantee). Non-owner app role, FORCE RLS, SET LOCAL per txn. Phase 2: schema-inspection test fails on unclassified tables; migration role bypasses RLS by design.
 - [x] ⛳ approval gate before ADR-002 — passed
-- [ ] ADR-002 Keycloak tenancy — verify (Organizations feature/version) → draft → review → Accept → merge
-- [ ] ⛳ approval gate before ADR-003
+- [x] ADR-002 Keycloak tenancy — verified (Keycloak 26.x Organizations GA since 26.0, 2026-07-21) → drafted → reviewed → **Accepted** → merged
+      Decision: single realm + Organizations (tenant = org). `organization` claim → app.current_tenant (spine with ADR-001). Multi-org users: fail-closed, single-org token only. Machine clients deferred to ADR-008.
+- [x] ⛳ approval gate before ADR-003 — passed
 - [ ] ADR-003 broker & client — verify (MassTransit/Rebus licensing) → draft → review → Accept → merge
 - [ ] ⛳ approval gate before ADR-004
 - [ ] ADR-004 custom CQRS + modular-monolith-first — verify (MediatR licensing) → draft → review → Accept → merge

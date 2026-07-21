@@ -1,6 +1,6 @@
 # ADR-002: Keycloak tenancy model
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-07-21
 - **Deciders:** Serhat Alaftekin
 - **Phase:** 0 (implemented in Phase 2)
@@ -51,6 +51,17 @@ cleanly with the data-tenancy decision. It is the identity-layer analogue of ADR
 shared infrastructure, strong logical isolation, purpose-built features over per-tenant
 physical separation.
 
+**Multi-organization users.** A user may belong to several organizations (e.g. an
+accountant serving multiple businesses). Keycloak's `organization` scope resolves this at
+the protocol level: requested bare (`organization`), it maps a lone membership directly and
+**prompts the user to select an organization** when they belong to several; requested as
+`organization:<alias>` it targets one specific tenant (e.g. resolved from the subdomain);
+`organization:*` returns all memberships. TerminWise treats a token as tenant-scoped only
+when its `organization` claim names **exactly one** organization: the API **rejects —
+fail-closed — any token whose organization claim is absent, or names multiple organizations
+without an explicit selection**, rather than guessing a tenant. RLS ([ADR-001](./0001-postgres-tenancy-model.md))
+remains the backstop if a bad claim ever slips through.
+
 ### Consequences
 
 - **Good — one coherent tenant-context pipeline.** `login → organization claim → API → app.current_tenant → RLS`. The Phase 2 acceptance ("login via Keycloak; role-restricted endpoints enforced"; "cross-tenant access provably blocked") is demonstrated across identity *and* data with one flow.
@@ -59,6 +70,7 @@ physical separation.
 - **Trade-off — shared realm config = shared blast radius.** Login themes, password policies, token lifetimes, and realm keys are shared; a realm-level misconfiguration or compromise affects all tenants. Per-organization customization exists (branding, auth steps, IdP) but is narrower than full realm isolation. (Consistent with the isolation trade-off already accepted in ADR-001.)
 - **Trade-off — token-claim trust is now security-critical.** The tenant id arrives from the token, so the API must validate it (signature, `organization` scope present, membership) before trusting it for `app.current_tenant`; a spoofed or missing claim must fail closed. RLS is the backstop if this is ever wrong.
 - **Trade-off — version floor and relative newness.** Requires **Keycloak 26.x** (Organizations is GA since 26.0, actively enhanced through 26.7); the feature must be **enabled** (server feature + per-realm Organizations setting). It is younger than realm-based tenancy, so operational patterns and tooling are still maturing — pin the version and track release notes.
+- **Trade-off — machine clients need a different tenant source.** Service accounts using the client-credentials flow (the AI service in Phase 4.5; service-to-service in Phase 6) do not "log in" to an organization, so their tenant identity cannot come from an interactive `organization` claim. How these obtain a tenant-scoped, least-privilege identity is **deliberately deferred to ADR-008** (authorization model for AI agents / machine clients) — recorded here so the gap is documented, not forgotten.
 - **Follow-up (Phase 2):** enable Organizations; model tenant = organization; add the `organization` scope to the API client; map the org id to the tenant-id claim the middleware reads; wire policy-based authorization (roles/permissions). The AI service's least-privilege service account (Phase 4.5, ADR-008) also lives in this realm.
 
 ## Pros and Cons of the Options
@@ -92,7 +104,8 @@ physical separation.
 Sources consulted (verified 2026-07-21, Keycloak 26.x; latest 26.7.0):
 
 - Keycloak Server Admin — [Managing Organizations (intro)](https://www.keycloak.org/docs/latest/server_admin/index.html): "provides some of the core capabilities needed to manage organizations… manage members, onboard via invitation links, federate identities through identity brokering, identity-first login and organization-specific auth steps, propagate organization-specific claims to applications through tokens."
-- Keycloak — Organization token claim: the `organization` claim (org id + attributes) is added to tokens when the **`organization` scope** is requested — e.g. `{"organization": {"testcorp": {"id": "…"}}}`.
+- Keycloak — Organization token claim: the `organization` claim (org id + attributes) is added to tokens when the **`organization` scope** is requested — e.g. `{"organization": {"testcorp": {"id": "…"}}}`. The scope is a built-in optional client scope, added to every realm client by default.
+- Keycloak — [Mapping organization claims](https://www.keycloak.org/docs/latest/server_admin/index.html): scope request forms — `organization` (single membership mapped directly; **prompts for selection when a member of multiple**), `organization:<alias>` (a specific org), `organization:*` (all memberships).
 - Keycloak — Managing identity providers for organizations: **"An identity provider can only be linked to a single organization,"** with domain-based auto-redirect (`Redirect when email domain matches`, `Any`).
 - Keycloak — Authenticating members: `Organization Identity-First Login` execution with the `Requires user membership` setting (fail if the user is not a member of any organization).
 - Keycloak Release Notes — [26.0.0](https://www.keycloak.org/docs/latest/release_notes/index.html): **"Starting with Keycloak 26, the Organizations feature is fully supported."** Enhancements since: organization groups (26.6), fine-grained org-admin delegation (26.7).
