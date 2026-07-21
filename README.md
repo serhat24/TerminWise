@@ -92,7 +92,7 @@ Full plan in [`ROADMAP.md`](./ROADMAP.md). Progress:
 
 | Phase | Focus | Status |
 |---|---|---|
-| 0 | Foundation + ADRs | 🚧 in progress |
+| 0 | Foundation + ADRs | ✅ done |
 | 1 | Modular monolith MVP (Booking) | ⬜ |
 | 2 | Multi-tenancy + Keycloak + Redis | ⬜ |
 | 3 | RabbitMQ + Outbox/Inbox | ⬜ |

@@ -1,6 +1,6 @@
 Read ROADMAP.md before doing anything. It is the single source of truth.
 
-- Current phase: 0
+- Current phase: 1
 - We work strictly phase by phase. Never start work belonging to a later
   phase. A phase is done only when its acceptance criteria pass.
 - ADR-first: draft the ADR in docs/adr/ and get my approval BEFORE

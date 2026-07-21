@@ -54,8 +54,9 @@ gh api -X PUT repos/{owner}/TerminWise/branches/main/protection \
 
 - [x] 5.1 finalized README "architecture at a glance" (tenant-context spine, Mermaid validated) + docs/diagrams/tenant-context-spine.md
 - [x] 5.2 acceptance check: build/test/format green locally · 4 ADRs Accepted+merged · README vision+architecture ✔
-- [ ] 5.3 (on user confirm only) bump CLAUDE.md Current phase → 1 + flip README Phase 0 status → done
-- [~] ⛳ CHECKPOINT B — Phase 0 → Phase 1 gate (awaiting sign-off; do not start Phase 1 until confirmed)
+- [x] 5.3 bumped CLAUDE.md Current phase → 1 + flipped README Phase 0 status → done (confirmed 2026-07-21)
+- [x] ⛳ CHECKPOINT B — Phase 0 → Phase 1 gate — SIGNED OFF 2026-07-21
+- [x] 0.6 PUBLISH — user changed plan: publish now before Phase 1 (see publish result below)
 
 ## Blockers / needs from you
 
