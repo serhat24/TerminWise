@@ -52,10 +52,10 @@ gh api -X PUT repos/{owner}/TerminWise/branches/main/protection \
 
 ## Slice 5 — Close-out
 
-- [ ] 5.1 finalize README "architecture at a glance" + context diagram placeholder
-- [ ] 5.2 acceptance check: CI green · 4 ADRs merged · README vision+architecture
-- [ ] 5.3 (on user confirm only) bump CLAUDE.md Current phase → 1
-- [ ] ⛳ CHECKPOINT B — Phase 0 → Phase 1 gate (do not start Phase 1 until sign-off)
+- [x] 5.1 finalized README "architecture at a glance" (tenant-context spine, Mermaid validated) + docs/diagrams/tenant-context-spine.md
+- [x] 5.2 acceptance check: build/test/format green locally · 4 ADRs Accepted+merged · README vision+architecture ✔
+- [ ] 5.3 (on user confirm only) bump CLAUDE.md Current phase → 1 + flip README Phase 0 status → done
+- [~] ⛳ CHECKPOINT B — Phase 0 → Phase 1 gate (awaiting sign-off; do not start Phase 1 until confirmed)
 
 ## Blockers / needs from you
 
